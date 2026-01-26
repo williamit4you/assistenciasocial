@@ -23,8 +23,24 @@ async function getRecentTransactions() {
 
     // Combine and sort
     const combined = [
-        ...entries.map(e => ({ ...e, isEntry: true, category: e.type })),
-        ...exits.map(e => ({ ...e, isEntry: false }))
+        ...entries.map(e => ({
+            id: e.id,
+            date: e.date,
+            amount: Number(e.amount),
+            paymentMethod: e.paymentMethod,
+            description: e.description,
+            isEntry: true,
+            label: 'Entrada: ' + e.type
+        })),
+        ...exits.map(e => ({
+            id: e.id,
+            date: e.date,
+            amount: Number(e.amount),
+            paymentMethod: e.paymentMethod,
+            description: e.description,
+            isEntry: false,
+            label: 'Saída: ' + e.category
+        }))
     ].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 10)
 
     return combined
@@ -97,7 +113,7 @@ export default async function FinanceiroPage() {
                             <div key={t.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
                                 <div>
                                     <div className="font-medium">
-                                        {t.isEntry ? 'Entrada: ' + t.type : 'Saída: ' + t.category}
+                                        {t.label}
                                     </div>
                                     <div className="text-sm text-muted-foreground">
                                         {new Date(t.date).toLocaleDateString('pt-BR')} • {t.paymentMethod}
@@ -105,7 +121,7 @@ export default async function FinanceiroPage() {
                                     </div>
                                 </div>
                                 <div className={`font-bold ${t.isEntry ? 'text-green-600' : 'text-red-600'}`}>
-                                    {t.isEntry ? '+' : '-'}{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(t.amount))}
+                                    {t.isEntry ? '+' : '-'}{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(t.amount)}
                                 </div>
                             </div>
                         ))}
