@@ -2,6 +2,8 @@ import { getProducts } from "@/lib/stock-actions"
 import { PurchaseForm } from "./purchase-form"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 
+export const dynamic = 'force-dynamic'
+
 export default async function PurchasePage() {
     const products = await getProducts()
 

@@ -19,6 +19,8 @@ function SubmitButton() {
     )
 }
 
+export const dynamic = 'force-dynamic'
+
 export default function ExitPage() {
     const router = useRouter()
 

@@ -3,6 +3,8 @@ import { DollarSign, Package, TrendingDown, TrendingUp, AlertTriangle } from "lu
 import { getDashboardStats } from "@/lib/finance-actions"
 import Link from "next/link"
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
     const stats = await getDashboardStats()
 

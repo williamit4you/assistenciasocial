@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { getProducts } from "@/lib/stock-actions"
 import { Badge } from "@/components/ui/badge"
 
+export const dynamic = 'force-dynamic'
+
 export default async function EstoquePage() {
     const products = await getProducts()
 

@@ -46,6 +46,8 @@ async function getRecentTransactions() {
     return combined
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function FinanceiroPage() {
     const summary = await getFinancialSummary()
     const transactions = await getRecentTransactions()

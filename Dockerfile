@@ -1,8 +1,10 @@
 FROM node:20-slim AS base
 
+# Install OpenSSL and ca-certificates in the base image so it's available in ALL stages
+RUN apt-get update -y && apt-get install -y openssl ca-certificates
+
 # Install dependencies only when needed
 FROM base AS deps
-RUN apt-get update -y && apt-get install -y openssl
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
@@ -23,16 +25,16 @@ RUN npx prisma generate
 
 # Build Next.js
 # Disable telemetry during the build.
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 # Disable telemetry during runtime.
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -52,9 +54,9 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
+ENV PORT=3000
 # set hostname to localhost
-ENV HOSTNAME "0.0.0.0"
+ENV HOSTNAME="0.0.0.0"
 
 # server.js is created by next build from the standalone output
 CMD ["node", "server.js"]

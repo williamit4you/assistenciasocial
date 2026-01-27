@@ -18,6 +18,8 @@ function SubmitButton() {
     )
 }
 
+export const dynamic = 'force-dynamic'
+
 export default function NewProductPage() {
     const router = useRouter()
 

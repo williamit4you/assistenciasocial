@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge"
 import { format, isBefore, isAfter, addDays } from "date-fns"
 import { ptBR } from "date-fns/locale"
 
+export const dynamic = 'force-dynamic'
+
 export default async function VencimentosPage() {
     const expiringItems = await getExpiringProducts()
     const today = new Date()

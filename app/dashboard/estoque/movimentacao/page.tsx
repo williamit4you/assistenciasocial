@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 // This is a server component that fetches products
+export const dynamic = 'force-dynamic'
+
 export default async function MovimentacaoPage() {
     const products = await getProducts()
 
