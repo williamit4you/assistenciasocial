@@ -1,62 +1,81 @@
-FROM node:20-slim AS base
+############################################
+# Base
+############################################
+FROM node:20-alpine AS base
 
-# Install OpenSSL and ca-certificates in the base image so it's available in ALL stages
-RUN apt-get update -y && apt-get install -y openssl ca-certificates
+RUN apk add --no-cache libc6-compat openssl
 
-# Install dependencies only when needed
-FROM base AS deps
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
+
+############################################
+# Dependencies
+############################################
+FROM base AS deps
+
 COPY package.json package-lock.json* ./
+
 RUN \
   if [ -f package-lock.json ]; then npm ci; \
   else echo "Lockfile not found." && exit 1; \
   fi
 
-# Rebuild the source code only when needed
+
+############################################
+# Builder
+############################################
 FROM base AS builder
+
 WORKDIR /app
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma Client
+# Prisma Client
 RUN npx prisma generate
 
-# Build Next.js
-# Disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-# Production image, copy all the files and run next
-FROM base AS runner
+
+############################################
+# Runner (produção)
+############################################
+FROM node:20-alpine AS runner
+
 WORKDIR /app
 
 ENV NODE_ENV=production
-# Disable telemetry during runtime.
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN apk add --no-cache openssl
 
+# Usuário não-root
+RUN addgroup --system --gid 1001 nodejs \
+ && adduser  --system --uid 1001 nextjs
+
+# Arquivos públicos
 COPY --from=builder /app/public ./public
 
-# Set the correct permission for lookups
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
+# Diretórios usados pelo Next
+RUN mkdir -p .next \
+ && chown -R nextjs:nodejs .next public
 
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
+# Next standalone
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Prisma schema
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+
+# Prisma CLI fixada (evita breaking change)
+RUN npm install -g prisma@5.22.0
+
 USER nextjs
 
-EXPOSE 3000
-
-ENV PORT=3000
-# set hostname to localhost
-ENV HOSTNAME="0.0.0.0"
-
-# server.js is created by next build from the standalone output
-CMD ["node", "server.js"]
+# Em produção:
+# - aplica schema no banco
+# - sobe o Next
+CMD ["/bin/sh", "-c", "prisma migrate deploy && node server.js"]
