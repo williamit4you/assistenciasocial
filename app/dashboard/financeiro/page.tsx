@@ -21,6 +21,7 @@ async function getRecentTransactions() {
         include: { responsible: true }
     })
 
+
     // Combine and sort
     const combined = [
         ...entries.map(e => ({
