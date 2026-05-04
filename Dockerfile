@@ -78,4 +78,4 @@ USER nextjs
 # Em produção:
 # - aplica schema no banco
 # - sobe o Next
-CMD ["/bin/sh", "-c", "npx prisma db push --accept-data-loss && node server.js"]
+CMD ["/bin/sh", "-c", "npx prisma db push --accept-data-loss --skip-generate && node server.js"]
