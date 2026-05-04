@@ -45,8 +45,7 @@ export function AppSidebar({ className }: { className?: string }) {
             </nav>
             <div className="p-4 border-t">
                 <form action={async () => {
-                    // Client-side signout or server action
-                    await signOut()
+                    await signOut({ callbackUrl: '/login' })
                 }}>
                     <Button variant="ghost" className="w-full justify-start gap-3">
                         <LogOut className="w-4 h-4" />
