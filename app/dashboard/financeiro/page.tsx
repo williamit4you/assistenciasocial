@@ -3,11 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PlusCircle, MinusCircle } from "lucide-react"
 import Link from 'next/link'
 import { getFinancialSummary } from "@/lib/finance-actions"
-import { PrismaClient } from "@prisma/client"
-
-// Note: Usually we pass data via props or fetch in component
-// Here we are fetching in RSC
-const prisma = new PrismaClient()
+import { prisma } from "@/lib/prisma"
 
 async function getRecentTransactions() {
     const entries = await prisma.financialEntry.findMany({

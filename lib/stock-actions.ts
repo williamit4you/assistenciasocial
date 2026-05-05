@@ -1,11 +1,10 @@
 'use server'
 
 import { auth } from '@/lib/auth'
-import { PrismaClient, MovementType } from '@prisma/client'
+import { MovementType } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
-
-const prisma = new PrismaClient()
 
 const ProductSchema = z.object({
     name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),

@@ -1,11 +1,9 @@
 'use server'
 
 import { auth } from '@/lib/auth'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
-
-const prisma = new PrismaClient()
 
 const EntrySchema = z.object({
     amount: z.coerce.number().positive("O valor deve ser positivo"),
