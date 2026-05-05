@@ -1,12 +1,7 @@
-import { redirect } from "next/navigation"
-import { auth } from "@/lib/auth"
-
-export default async function Home() {
-  const session = await auth()
-
-  if (session?.user) {
-    redirect("/dashboard")
-  }
-
-  redirect("/login")
+// The middleware (auth.config.ts) handles all redirects for '/'
+// - Logged in  → /dashboard
+// - Logged out → /login
+// This component is never actually rendered.
+export default function Home() {
+    return null
 }

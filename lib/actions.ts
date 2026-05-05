@@ -8,7 +8,9 @@ export async function authenticate(
     formData: FormData,
 ) {
     try {
-        await signIn('credentials', formData, { redirectTo: '/dashboard' })
+        // NextAuth v5: redirectTo must be inside the second argument object
+        const data = Object.fromEntries(formData)
+        await signIn('credentials', { ...data, redirectTo: '/dashboard' })
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {

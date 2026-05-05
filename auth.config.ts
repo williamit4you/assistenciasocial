@@ -7,15 +7,32 @@ export const authConfig = {
     callbacks: {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
-            const isOnDashboard = nextUrl.pathname.startsWith('/dashboard') || nextUrl.pathname === '/'; // Protect root too or redirect
-            const isOnLogin = nextUrl.pathname.startsWith('/login');
+            const pathname = nextUrl.pathname;
+
+            const isOnDashboard = pathname.startsWith('/dashboard');
+            const isOnLogin = pathname.startsWith('/login');
+            const isOnRoot = pathname === '/';
+
+            // Always allow NextAuth API routes
+            if (pathname.startsWith('/api/auth')) return true;
 
             if (isOnDashboard) {
                 if (isLoggedIn) return true;
-                return false; // Redirect unauthenticated users to login page
-            } else if (isLoggedIn && isOnLogin) {
+                // Unauthenticated: redirect to login (not just return false)
+                return Response.redirect(new URL('/login', nextUrl));
+            }
+
+            if (isOnRoot) {
+                // Root: redirect based on auth state
+                if (isLoggedIn) return Response.redirect(new URL('/dashboard', nextUrl));
+                return Response.redirect(new URL('/login', nextUrl));
+            }
+
+            if (isLoggedIn && isOnLogin) {
+                // Already logged in, send to dashboard
                 return Response.redirect(new URL('/dashboard', nextUrl));
             }
+
             return true;
         },
     },
